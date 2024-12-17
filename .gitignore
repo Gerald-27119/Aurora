@@ -8,6 +8,10 @@
 .env.production.local
 .env.development.local
 
+# Ignorowanie lock files
+package-lock.json
+yarn.lock
+
 # FastAPI - Python virtualenv, cache i bazy SQLite
 venv/
 .venv/
@@ -20,6 +24,12 @@ __pycache__/
 *.sqlite3-journal
 .env
 .env.*
+requirements.txt
+pip-log.txt
+
+# Pliki cache narzędzi
+.cache/
+.eslintcache
 
 # Logi systemowe i aplikacyjne
 *.log
@@ -45,3 +55,8 @@ Thumbs.db
 # Ignorowanie buildów frontendowych
 frontend/build/
 frontend/public/
+
+# Ignorowanie plików specyficznych dla narzędzi Pythonowych
+pyproject.toml
+poetry.lock
+__init__.py
