@@ -1,0 +1,47 @@
+# Ignorowanie katalogu node_modules i buildów Vite
+**/node_modules/
+**/dist/
+**/.vite/
+
+# Ignorowanie plików środowiskowych Vite
+.env.local
+.env.production.local
+.env.development.local
+
+# FastAPI - Python virtualenv, cache i bazy SQLite
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.sqlite3
+*.sqlite3-journal
+.env
+.env.*
+
+# Logi systemowe i aplikacyjne
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Pliki IDE (PyCharm, WebStorm)
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Pliki tymczasowe systemowe
+.DS_Store
+Thumbs.db
+
+# Ignorowanie backupów i plików edytorów
+*.swp
+*.swo
+*.bak
+~*
+
+# Ignorowanie buildów frontendowych
+frontend/build/
+frontend/public/
