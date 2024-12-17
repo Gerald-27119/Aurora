@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
 
+# To run project type: pip install -r requirements.txt
+# python -m uvicorn main:app --reload
 app = FastAPI()
 
 app.add_middleware(
@@ -11,6 +13,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
 @app.get("/")
 async def root():
     return {"message": "Hello World From FastAPI"}
@@ -24,7 +28,8 @@ async def say_hello(name: str):
 class Request(BaseModel):
     prompt: str
     quantity: int
+
+
 @app.post("/")
 async def post(request: Request):
     return {"message": "Got your request"}
-
