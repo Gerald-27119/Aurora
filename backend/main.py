@@ -1,9 +1,10 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
-from starlette.middleware.cors import CORSMiddleware
+import os
 
-# To run project type: pip install -r requirements.txt
-# python -m uvicorn main:app --reload
+from fastapi import FastAPI, UploadFile, File
+from starlette.middleware.cors import CORSMiddleware
+from starlette.responses import JSONResponse
+from first.model_logic import load_model, predict_image
+
 app = FastAPI()
 
 app.add_middleware(
@@ -14,22 +15,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+model = load_model()
 
 @app.get("/")
 async def root():
     return {"message": "Hello World From FastAPI"}
 
+@app.post("/predict")
+async def predict(image: UploadFile = File(...)):
+    try:
+        temp_file_path = f"./temp_{image.filename}"
+        with open(temp_file_path, "wb") as temp_file:
+            temp_file.write(image.file.read())
 
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
+        prediction = predict_image(temp_file_path, model)
 
+        os.remove(temp_file_path)
 
-class Request(BaseModel):
-    prompt: str
-    quantity: int
-
-
-@app.post("/")
-async def post(request: Request):
-    return {"message": "Got your request"}
+        return JSONResponse(prediction)
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
