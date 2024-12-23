@@ -42,6 +42,7 @@ export default function FirstModel() {
 
     return (
         <div>
+            <p className="mb-10"># The model is better in distinguishing cars, trucks, vans from tanks then random objects from tanks (theoretically, bcs it was trained on tanks and other vehicles) </p>
             <form onSubmit={handleSubmit}>
                 <input type="file" accept="image/*" onChange={handleFileChange}/>
                 <button type="submit">Upload & Predict</button>

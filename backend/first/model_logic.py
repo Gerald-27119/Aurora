@@ -4,12 +4,15 @@ from PIL import Image
 
 MODEL_PATH = "./first/tank_classifier.pth"
 
+from torchvision.models import ResNet50_Weights
+
 def load_model():
-    model = models.resnet50(weights=None)  # Use weights=None instead of pretrained=False
+    model = models.resnet50(weights=ResNet50_Weights.IMAGENET1K_V1)
     model.fc = torch.nn.Linear(model.fc.in_features, 1)
-    model.load_state_dict(torch.load(MODEL_PATH, weights_only=True))
+    model.load_state_dict(torch.load(MODEL_PATH))
     model.eval()
     return model
+
 
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
@@ -24,4 +27,6 @@ def predict_image(image_path, model):
         output = model(img_tensor).item()
         confidence = torch.sigmoid(torch.tensor(output)).item()
         label = "Tank" if confidence > 0.5 else "Non-Tank"
-    return {"result": label, "confidence": confidence}
+    # formatting confidence as precentage
+    formatted_confidence = f"{confidence * 100:.2f}%"
+    return {"result": label, "confidence": formatted_confidence}

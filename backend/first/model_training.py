@@ -11,7 +11,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-DATA_DIR = "../datasets/tanks"
+DATA_DIR = "../datasets"
 MODEL_PATH = "./tank_classifier.pth"
 
 transform = transforms.Compose([
@@ -21,8 +21,10 @@ transform = transforms.Compose([
 ])
 
 logger.info("Loading dataset...")
-dataset = datasets.ImageFolder(root="../datasets", transform=transform)
+dataset = datasets.ImageFolder(root=DATA_DIR, transform=transform)
 logger.info(f"Dataset loaded with {len(dataset)} images.")
+
+logger.info(f"Classes: {dataset.classes}")
 
 # Split into training and validation sets
 train_size = int(0.8 * len(dataset))
@@ -39,11 +41,12 @@ val_loader = DataLoader(val_dataset, batch_size=16, shuffle=False)
 # Load pre-trained ResNet50 model
 logger.info("Loading model...")
 model = models.resnet50(weights=ResNet50_Weights.IMAGENET1K_V1)
-model.fc = nn.Linear(model.fc.in_features, 1)
+model.fc = nn.Linear(model.fc.in_features, 1)  # Adjust for binary classification
 logger.info("Model loaded successfully.")
 logger.info(f"Model architecture:\n{model}")
 
-criterion = nn.BCEWithLogitsLoss()
+# Define loss function and optimizer
+criterion = nn.BCEWithLogitsLoss()  # Binary classification loss
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 def train_model(epochs=10):
@@ -52,8 +55,8 @@ def train_model(epochs=10):
     for epoch in range(epochs):
         running_loss = 0.0
         logger.info(f"Epoch {epoch + 1}/{epochs} started.")
-        for i, (inputs, _) in enumerate(train_loader):
-            labels = torch.ones(inputs.size(0), 1)  # All labels are "1" for tanks
+        for i, (inputs, labels) in enumerate(train_loader):
+            labels = labels.float().unsqueeze(1)  # Convert labels to float for BCEWithLogitsLoss
             optimizer.zero_grad()
             outputs = model(inputs).unsqueeze(1).squeeze(-1)
             loss = criterion(outputs, labels)
@@ -74,8 +77,8 @@ def validate_model():
     model.eval()
     total_loss = 0.0
     with torch.no_grad():
-        for inputs, _ in val_loader:
-            labels = torch.ones(inputs.size(0), 1)
+        for inputs, labels in val_loader:
+            labels = labels.float().unsqueeze(1)  # Convert labels to float for BCEWithLogitsLoss
             outputs = model(inputs).unsqueeze(1).squeeze(-1)
             loss = criterion(outputs, labels)
             total_loss += loss.item()
