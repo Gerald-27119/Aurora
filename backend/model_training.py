@@ -23,7 +23,7 @@ def main():
     train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=32)
 
-    optimizer = Adam(model.parameters(), lr=1e-4)
+    optimizer = Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
 
     print("Started training...")
 
