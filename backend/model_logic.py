@@ -1,33 +1,30 @@
-import torch
-from PIL import Image
-from torchvision import transforms
-from transformers import EfficientNetForImageClassification
-import torch.nn as nn
+import numpy as np
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing import image
 
-MODEL_PATH = "efficientnet_tank_classifier.pth"
+model = load_model('models/efficientnetb0_best.h5')
 
-def load_model():
-    model = EfficientNetForImageClassification.from_pretrained("google/efficientnet-b0")
-    model.classifier = nn.Sequential(
-        nn.Dropout(0.5),
-        nn.Linear(model.classifier.in_features, 2)
-    )
-    model.load_state_dict(torch.load(MODEL_PATH, weights_only=True))
-    model.eval()
-    return model
+# Define class names (same as used during training)
+class_names = ['Tesla_Model_3', 'BMW_X5', 'Audi_A4']
 
-def preprocess_image(image_path):
-    transform = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-    ])
-    image = Image.open(image_path).convert("RGB")
-    return transform(image).unsqueeze(0)
+def preprocess_image(img_path):
+    """
+    Preprocess the image for EfficientNet model input.
+    :param img_path: Path to the image file
+    :return: Preprocessed image as a numpy array
+    """
+    img = image.load_img(img_path, target_size=(224, 224))
+    img_array = image.img_to_array(img) / 255.0
+    img_array = np.expand_dims(img_array, axis=0)
+    return img_array
 
-def predict_with_threshold(model, image_tensor, threshold=0.7):
-    with torch.no_grad():
-        logits = model(image_tensor).logits
-        probs = torch.softmax(logits, dim=-1)
-        confidence, predicted_class = torch.max(probs, dim=-1)
-    return "Tank" if confidence.item() >= threshold and predicted_class.item() == 1 else "Non-Tank"
+def predict_car_model(img_path):
+    """
+    Predict the car model from the given image.
+    :param img_path: Path to the image file
+    :return: Predicted car model name
+    """
+    img_array = preprocess_image(img_path)
+    predictions = model.predict(img_array)
+    predicted_class = class_names[np.argmax(predictions[0])]
+    return predicted_class
