@@ -1,30 +1,48 @@
+import tensorflow as tf
 import numpy as np
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image
+from tensorflow.io import read_file
+from tensorflow.image import decode_jpeg, resize
+import os
 
-model = load_model('models/efficientnetb0_best.h5')
 
-# Define class names (same as used during training)
-class_names = ['Tesla_Model_3', 'BMW_X5', 'Audi_A4']
+def get_class_names():
+    training_dir = "dataset/car_data/train"
+    return sorted([d for d in os.listdir(training_dir) if os.path.isdir(os.path.join(training_dir, d))])
+
+
+def load_model(num_classes, input_shape=(224, 224, 3)):
+    model_path = "models/efficientnetb0_best_weights"
+    base_model = tf.keras.applications.EfficientNetB0(include_top=False, input_shape=input_shape)
+    base_model.trainable = False
+
+    model = tf.keras.Sequential([
+        base_model,
+        tf.keras.layers.GlobalAveragePooling2D(),
+        tf.keras.layers.Dense(128, activation='relu'),
+        tf.keras.layers.Dropout(0.3),
+        tf.keras.layers.Dense(num_classes, activation='softmax')
+    ])
+
+    model.load_weights(model_path)
+    return model
+
 
 def preprocess_image(img_path):
-    """
-    Preprocess the image for EfficientNet model input.
-    :param img_path: Path to the image file
-    :return: Preprocessed image as a numpy array
-    """
-    img = image.load_img(img_path, target_size=(224, 224))
-    img_array = image.img_to_array(img) / 255.0
-    img_array = np.expand_dims(img_array, axis=0)
+    img = read_file(img_path)
+    img = decode_jpeg(img, channels=3)
+    img = resize(img, [224, 224]) / 255.0
+    img_array = tf.expand_dims(img, axis=0)
     return img_array
 
+
 def predict_car_model(img_path):
-    """
-    Predict the car model from the given image.
-    :param img_path: Path to the image file
-    :return: Predicted car model name
-    """
+    class_names = get_class_names()
+
+    model = load_model(num_classes=len(class_names))
+
     img_array = preprocess_image(img_path)
-    predictions = model.predict(img_array)
-    predicted_class = class_names[np.argmax(predictions[0])]
+
+    predictions = model(img_array, training=False)
+    predicted_class = class_names[np.argmax(predictions.numpy())]
+
     return predicted_class
