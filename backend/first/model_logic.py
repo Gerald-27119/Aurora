@@ -2,7 +2,7 @@ import torch
 from torchvision import models, transforms
 from PIL import Image
 
-MODEL_PATH = "./first/tank_classifier.pth"
+MODEL_PATH = "./first/car_classifier.pth"
 
 from torchvision.models import ResNet50_Weights
 
