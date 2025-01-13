@@ -1,3 +1,4 @@
+import json
 import logging
 import torch
 from torch import nn, optim
@@ -12,59 +13,12 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 DATA_DIR = "../datasets/car_data/train"
+# DATA_DIR = "../datasets/car_data/small_train"
 MODEL_PATH = "./car_classifier.pth"
+CLASSES_PATH = "./classes.json"  # Ścieżka do zapisu klas
 
-print(f"CUDA available: {torch.cuda.is_available()}")
-print(f"CUDA version: {torch.version.cuda}")
-print(f"GPU: {torch.cuda.get_device_name(0)}")
-
-# Set device
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-logger.info(f"Using device: {device}")
-
-# Define transformations
-transform = transforms.Compose([
-    transforms.Resize((224, 224)),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-])
-
-# Load the dataset
-logger.info("Loading dataset...")
-dataset = datasets.ImageFolder(root=DATA_DIR, transform=transform)
-logger.info(f"Dataset loaded with {len(dataset)} images.")
-logger.info(f"Classes: {dataset.classes}")
-
-# Number of classes
-num_classes = len(dataset.classes)
-
-# Split into training and validation sets
-train_size = int(0.8 * len(dataset))
-val_size = len(dataset) - train_size
-train_dataset, val_dataset = torch.utils.data.random_split(
-    dataset, [train_size, val_size]
-)
-
-logger.info(f"Training set size: {len(train_dataset)}")
-logger.info(f"Validation set size: {len(val_dataset)}")
-
-# Load datasets into DataLoaders
-train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
-val_loader = DataLoader(val_dataset, batch_size=16, shuffle=False)
-
-# Load pre-trained ResNet50 model
-logger.info("Loading model...")
-model = models.resnet50(weights=ResNet50_Weights.IMAGENET1K_V1)
-model.fc = nn.Linear(model.fc.in_features, num_classes)  # Multi-class output
-model.to(device)
-logger.info("Model loaded successfully.")
-logger.info(f"Model architecture:\n{model}")
-
-# Define loss function and optimizer
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001)
-
-def train_model(epochs=10):
+# Definicje funkcji treningu i walidacji pozostają bez zmian
+def train_model(train_loader, model, criterion, optimizer, device, epochs=20):
     logger.info("Starting training...")
     model.train()
 
@@ -73,8 +27,8 @@ def train_model(epochs=10):
         logger.info(f"Epoch {epoch + 1}/{epochs} started.")
 
         for i, (inputs, labels) in enumerate(train_loader):
-            inputs = inputs.to(device)
-            labels = labels.to(device)
+            inputs = inputs.to(device, non_blocking=True)
+            labels = labels.to(device, non_blocking=True)
 
             optimizer.zero_grad()
             outputs = model(inputs)
@@ -98,7 +52,7 @@ def train_model(epochs=10):
     torch.save(model.state_dict(), MODEL_PATH)
     logger.info(f"Model saved to {MODEL_PATH}")
 
-def validate_model():
+def validate_model(val_loader, model, criterion, device):
     logger.info("Starting validation...")
     model.eval()
     total_loss = 0.0
@@ -107,8 +61,8 @@ def validate_model():
 
     with torch.no_grad():
         for inputs, labels in val_loader:
-            inputs = inputs.to(device)
-            labels = labels.to(device)
+            inputs = inputs.to(device, non_blocking=True)
+            labels = labels.to(device, non_blocking=True)
             outputs = model(inputs)
             loss = criterion(outputs, labels)
             total_loss += loss.item()
@@ -125,6 +79,59 @@ def validate_model():
 
 if __name__ == "__main__":
     logger.info("Script started.")
-    train_model(epochs=10)
-    validate_model()
+
+    # Set device
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    logger.info(f"Using device: {device}")
+
+    # Define transformations
+    transform = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
+
+    # Load the dataset
+    logger.info("Loading dataset...")
+    dataset = datasets.ImageFolder(root=DATA_DIR, transform=transform)
+    logger.info(f"Dataset loaded with {len(dataset)} images.")
+    logger.info(f"Classes: {dataset.classes}")
+
+    # Zapisanie listy klas do pliku JSON
+    with open(CLASSES_PATH, "w") as f:
+        json.dump(dataset.classes, f)
+    logger.info(f"Lista klas zapisana do {CLASSES_PATH}")
+
+    # Number of classes
+    num_classes = len(dataset.classes)
+
+    # Split into training and validation sets
+    train_size = int(0.8 * len(dataset))
+    val_size = len(dataset) - train_size
+    train_dataset, val_dataset = torch.utils.data.random_split(
+        dataset, [train_size, val_size]
+    )
+
+    logger.info(f"Training set size: {len(train_dataset)}")
+    logger.info(f"Validation set size: {len(val_dataset)}")
+
+    # Load datasets into DataLoaders
+    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, num_workers=4, pin_memory=True)
+    val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False, num_workers=4, pin_memory=True)
+
+    # Load pre-trained ResNet50 model
+    logger.info("Loading model...")
+    model = models.resnet50(weights=ResNet50_Weights.IMAGENET1K_V1)
+    model.fc = nn.Linear(model.fc.in_features, num_classes)  # Multi-class output
+    model.to(device)
+    logger.info("Model loaded successfully.")
+
+    # Define loss function and optimizer
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+    # Trening i walidacja
+    train_model(train_loader, model, criterion, optimizer, device, epochs=60)
+    validate_model(val_loader, model, criterion, device)
+
     logger.info("Script finished.")
