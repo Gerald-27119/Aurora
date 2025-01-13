@@ -1,7 +1,7 @@
 import os
 from model_logic import predict_car_model
 
-test_images_path = './test_imgs'
+test_images_path = '../test_imgs'
 
 def test_model_on_images(test_path):
     for img_name in os.listdir(test_path):

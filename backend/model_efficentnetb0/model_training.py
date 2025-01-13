@@ -47,8 +47,8 @@ def create_dataloader(directory, batch_size=32):
 
 
 def train_model():
-    train_dir = "dataset/car_data/train"
-    test_dir = "dataset/car_data/test"
+    train_dir = "../dataset/car_data/train"
+    test_dir = "../dataset/car_data/test"
 
     train_loader, train_class_names = create_dataloader(train_dir)
     val_loader, _ = create_dataloader(test_dir)

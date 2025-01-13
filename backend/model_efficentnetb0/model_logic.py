@@ -6,7 +6,7 @@ import os
 
 
 def get_class_names():
-    training_dir = "dataset/car_data/train"
+    training_dir = "../dataset/car_data/train"
     return sorted([d for d in os.listdir(training_dir) if os.path.isdir(os.path.join(training_dir, d))])
 
 
