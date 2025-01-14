@@ -32,7 +32,7 @@ The project leverages the following models for car model classification:
 The primary goal of the project is to compare the performance of different neural network architectures on the car model recognition task. By using ResNet50, EfficientNetB0, and MobileNetV2, we can analyze their strengths and weaknesses in terms of accuracy, precision, recall, and F1 score. Each model provides a **confidence score** for its predictions, allowing us to evaluate not only the correctness of the prediction but also the model's certainty about its decision. This comparison provides valuable insights into which architecture is best suited for the specific requirements of car model classification.
 
 ## Dataset
-Our dataset is Stanford Car Dataset by classes folder [link](https://www.kaggle.com/datasets/jutrera/stanford-car-dataset-by-classes-folder).
+Our dataset is Stanford Car Dataset by classes folder [[link](https://www.kaggle.com/datasets/jutrera/stanford-car-dataset-by-classes-folder)].  It contains images of **196 car models**, with a total of **16,185 images**. The data is split into 8,144 training images and 8,041 testing images.
 ## Requirements
 
 - Python 3.11
