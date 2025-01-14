@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **Aurora Project** is designed to recognize the model of a car from a dataset containing hundreds of vehicle images. The backend processes images using three different pre-trained deep learning models to classify the car models, and the results are compared based on metrics such as accuracy, precision, recall, and F1 score.
+The **Aurora Project** is designed to recognize the model of a car from a dataset containing hundreds of vehicle images. The backend processes images using three different pre-trained deep learning models to classify the car models, and the results are compared based on metrics such as accuracy, precision, recall, and F1 score. Each model also returns a **confidence score**, which is the probability (in percentage) that the model assigns to its predicted class.
 
 ## Models Used
 
@@ -22,7 +22,7 @@ The project leverages the following models for car model classification:
 
 ## Why These Models?
 
-The primary goal of the project is to compare the performance of different neural network architectures on the car model recognition task. By using ResNet50, EfficientNetB0, and MobileNetV2, we can analyze their strengths and weaknesses in terms of accuracy, precision, recall, and F1 score. This comparison provides valuable insights into which architecture is best suited for the specific requirements of car model classification.
+The primary goal of the project is to compare the performance of different neural network architectures on the car model recognition task. By using ResNet50, EfficientNetB0, and MobileNetV2, we can analyze their strengths and weaknesses in terms of accuracy, precision, recall, and F1 score. Each model provides a **confidence score** for its predictions, allowing us to evaluate not only the correctness of the prediction but also the model's certainty about its decision. This comparison provides valuable insights into which architecture is best suited for the specific requirements of car model classification.
 
 ## Requirements
 
