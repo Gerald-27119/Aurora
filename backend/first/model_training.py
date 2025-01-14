@@ -131,7 +131,7 @@ if __name__ == "__main__":
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
     # Trening i walidacja
-    train_model(train_loader, model, criterion, optimizer, device, epochs=100)
+    train_model(train_loader, model, criterion, optimizer, device, epochs=10)
     validate_model(val_loader, model, criterion, device)
 
     logger.info("Script finished.")

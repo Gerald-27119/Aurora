@@ -12,8 +12,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# DATA_DIR = "../datasets/car_data/train"
-DATA_DIR = "../datasets/car_data/small_train"
+DATA_DIR = "../datasets/car_data/train"
+# DATA_DIR = "../datasets/car_data/small_train"
 MODEL_PATH = "./car_classifier_mobilenetv2.pth"
 CLASSES_PATH = "./classes.json"
 
