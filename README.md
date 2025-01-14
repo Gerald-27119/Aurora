@@ -79,7 +79,7 @@ The backend is built using FastAPI. Follow these steps to set up and run the bac
     uvicorn main:app --reload
     ```
 
-    The backend will be running at `http://127.0.0.1:8000`.
+    The backend will be running at `http://localhost:8000`.
 
 ## Frontend Setup
 
@@ -103,6 +103,6 @@ The frontend is built using Vite. Follow these steps to set up and run the front
     npm run dev
     ```
 
-    The frontend will be running at `http://127.0.0.1:5173`.
+    The frontend will be running at `http://localhost:5173`.
 
 ## Project should be up and running
