@@ -4,7 +4,7 @@
 
 The project was developed by **Adam Langmesser (s27119)** and **Stanisław Oziemczuk (s26982)**:
 
-- **Adam Langmesser** worked on the implementation of the **ResNet50** and **MobileNetV2** models, including the calculation of their performance metrics (accuracy, recall, precision, F1 score, and others). He also took care of version control.
+- **Adam Langmesser** worked on the implementation of the **ResNet50** and **MobileNetV2** models, including the calculation of their performance metrics (accuracy, recall, precision, F1 score, and others), he also took care of version control. Moreover, Adam also set up the backend endpoints for communication with frontend.
 - **Stanisław Oziemczuk** focused on the **EfficientNetB0** model and its statistics. He also developed the **frontend panel**, allowing users to upload images to the models via a web interface and view the performance statistics for each model. Additionally, Stanisław identified and prepared the appropriate **dataset** for the project.
 
 ## Overview
