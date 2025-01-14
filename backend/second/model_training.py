@@ -72,7 +72,7 @@ def train_model():
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(base_model.parameters(), lr=0.001)
 
-    epochs = 10
+    epochs = 30
     early_stopping_patience = 5
     best_val_loss = float('inf')
     patience_counter = 0
