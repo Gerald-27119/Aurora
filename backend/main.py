@@ -26,7 +26,31 @@ mobilenet_model = load_mobile_model()
 @app.get("/")
 async def root():
     return {"message": "Hello World From FastAPI"}
+metrics_paths = {
+    "resnet50": "first/model_metrics.txt",
+    "efficientnetb0": "second/model_metrics.txt",
+    "mobilenetv2": "third/model_metrics.txt"
+}
 
+def load_metrics(file_path):
+    """Reads the metrics from a file and returns them as a dictionary."""
+    if not os.path.exists(file_path):
+        return {"error": f"Metrics file {file_path} not found."}
+
+    metrics = {}
+    with open(file_path, "r") as file:
+        for line in file:
+            key, value = line.strip().split(":")
+            metrics[key.strip()] = float(value.strip())
+    return metrics
+
+@app.get("/metrics")
+async def metrics():
+    """Returns metrics for each model."""
+    all_metrics = {}
+    for model_name, path in metrics_paths.items():
+        all_metrics[model_name] = load_metrics(path)
+    return all_metrics
 @app.post("/predict")
 async def predict(image: UploadFile = File(...)):
     try:

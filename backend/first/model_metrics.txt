@@ -1,0 +1,4 @@
+Accuracy: 0.2
+Precision: 0.2
+Recall: 0.2
+F1 Score: 0.2
