@@ -122,7 +122,7 @@ The backend is built using FastAPI. Follow these steps to set up and run the bac
 
 The frontend is built using Vite. Follow these steps to set up and run the frontend:
 
-1. **Navigate to the frontend directory:**
+1. **Navigate to the frontend directory in a seperate console window:**
 
     ```sh
     cd ../frontend
