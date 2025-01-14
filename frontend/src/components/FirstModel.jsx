@@ -2,7 +2,7 @@ import { useState } from "react";
 
 export default function FirstModel() {
     const [file, setFile] = useState(null); // To store the selected file
-    const [results, setResults] = useState(null); // To store the results from both models
+    const [results, setResults] = useState(null); // To store the results from all models
     const [error, setError] = useState(null); // To handle any errors
 
     // Handle file selection
@@ -34,6 +34,7 @@ export default function FirstModel() {
                 setResults({
                     resnet50: data.resnet50,
                     mobilenetv2: data.mobilenetv2,
+                    efficientnetb0: data.efficientnetb0,
                 });
             } else {
                 const errorData = await response.json();
@@ -47,7 +48,7 @@ export default function FirstModel() {
     return (
         <div>
             <p className="mb-10">
-                # The model is better in distinguishing cars, trucks, vans from tanks than random objects from tanks (theoretically, because it was trained on tanks and other vehicles)
+                # The model is better at distinguishing cars, trucks, vans from tanks than random objects from tanks (theoretically, because it was trained on tanks and other vehicles)
             </p>
             <form onSubmit={handleSubmit}>
                 <input type="file" accept="image/*" onChange={handleFileChange} />
@@ -62,6 +63,10 @@ export default function FirstModel() {
                     <h3>MobileNetV2 Prediction:</h3>
                     <p style={{ color: "orange" }}>
                         Result: {results.mobilenetv2.result}, Confidence: {results.mobilenetv2.confidence}
+                    </p>
+                    <h3>EfficientNetB0 Prediction:</h3>
+                    <p style={{ color: "yellow" }}>
+                        Result: {results.efficientnetb0.result}, Confidence: {results.efficientnetb0.confidence}
                     </p>
                 </div>
             )}
