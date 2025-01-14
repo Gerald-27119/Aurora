@@ -1,8 +1,11 @@
+# main.py
+
 import os
 from fastapi import FastAPI, UploadFile, File
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
-from first.model_logic import load_model, predict_image
+from first.model_logic import load_model as load_resnet_model, predict_image as predict_resnet
+from third.model_logic import load_model as load_mobile_model, predict_image as predict_image_mobile
 
 app = FastAPI()
 
@@ -14,8 +17,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Ładowanie modelu podczas startu aplikacji
-model = load_model()
+# Ładowanie modeli podczas startu aplikacji
+resnet_model = load_resnet_model()
+mobilenet_model = load_mobile_model()
 
 @app.get("/")
 async def root():
@@ -33,12 +37,21 @@ async def predict(image: UploadFile = File(...)):
         with open(temp_file_path, "wb") as temp_file:
             temp_file.write(await image.read())
 
-        # Predykcja
-        prediction = predict_image(temp_file_path, model)
+        # Predykcja za pomocą ResNet50
+        prediction_resnet = predict_resnet(temp_file_path, resnet_model)
+
+        # Predykcja za pomocą MobileNetV2
+        prediction_mobilenet = predict_image_mobile(temp_file_path, mobilenet_model)
 
         # Usunięcie tymczasowego pliku
         os.remove(temp_file_path)
 
-        return JSONResponse(prediction)
+        # Zwrócenie obu predykcji jako jeden JSON
+        combined_prediction = {
+            "resnet50": prediction_resnet,
+            "mobilenetv2": prediction_mobilenet
+        }
+
+        return JSONResponse(combined_prediction)
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=500)
