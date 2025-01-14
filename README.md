@@ -24,6 +24,13 @@ The project leverages the following models for car model classification:
 
 The primary goal of the project is to compare the performance of different neural network architectures on the car model recognition task. By using ResNet50, EfficientNetB0, and MobileNetV2, we can analyze their strengths and weaknesses in terms of accuracy, precision, recall, and F1 score. Each model provides a **confidence score** for its predictions, allowing us to evaluate not only the correctness of the prediction but also the model's certainty about its decision. This comparison provides valuable insights into which architecture is best suited for the specific requirements of car model classification.
 
+## Project Contributors
+
+The project was developed by **Adam Langmesser (s27119)** and **Stanisław Oziemczuk (s26982)**:
+
+- **Adam Langmesser** worked on the implementation of the **ResNet50** and **MobileNetV2** models, including the calculation of their performance metrics (accuracy, recall, precision, F1 score, and others).  
+- **Stanisław Oziemczuk** focused on the **EfficientNetB0** model and its statistics. He also developed the **frontend panel**, allowing users to upload images to the models via a web interface and view the performance statistics for each model. Additionally, Stanisław identified and prepared the appropriate **dataset** for the project.
+
 ## Requirements
 
 - Python 3.11
