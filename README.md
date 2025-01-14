@@ -18,29 +18,29 @@ The project leverages the following models for car model classification:
 1. **ResNet50**  
    ResNet50 (Residual Neural Network) is a powerful deep convolutional neural network known for its ability to handle the vanishing gradient problem in deep architectures. Its residual blocks allow for efficient and accurate training of very deep networks.  
    **Reason for use**: ResNet50 is a well-established model for image classification tasks and provides a strong baseline for comparing performance.  
-   **Performance**:  
-   - Accuracy: **0.9211**  
-   - Precision: **0.8976**  
-   - Recall: **0.9012**  
-   - F1 Score: **0.9212**  
+   **Performance**:
+   - Accuracy: **0.9152**
+   - Precision: **0.8846**
+   - Recall: **0.9102**
+   - F1 Score: **0.8971** 
 
-2. **EfficientNetB0**  
+3. **EfficientNetB0**  
    EfficientNetB0 is part of the EfficientNet family, which uses a compound scaling method to balance the depth, width, and resolution of the model for optimal performance. It achieves high accuracy with fewer parameters and less computational cost compared to other models.  
    **Reason for use**: EfficientNetB0 offers a balance between computational efficiency and accuracy, making it ideal for resource-constrained environments.  
    **Performance**:  
-   - Accuracy: **0.4234**  
-   - Precision: **0.5623**  
-   - Recall: **0.5544**  
-   - F1 Score: **0.4311**  
+   - Accuracy: **0.3152**
+   - Precision: **0.2512**
+   - Recall: **0.2001**
+   - F1 Score: **0.2227** 
 
-3. **MobileNetV2**  
+4. **MobileNetV2**  
    MobileNetV2 is a lightweight model designed for mobile and embedded applications. It uses depthwise separable convolutions to reduce computational cost while maintaining accuracy.  
    **Reason for use**: MobileNetV2 is suitable for tasks requiring fast inference with limited hardware resources, such as real-time car model recognition.  
    **Performance**:  
-   - Accuracy: **0.7831**  
-   - Precision: **0.8032**  
-   - Recall: **0.7832**  
-   - F1 Score: **0.7754**  
+   - Accuracy: **0.8016**
+   - Precision: **0.7985**
+   - Recall: **0.8064**
+   - F1 Score: **0.8024**  
 
 ---
 
