@@ -49,7 +49,7 @@ The project leverages the following models for car model classification:
 The models showed varying levels of performance on the car model recognition task:
 
 - **ResNet50** significantly outperformed the other models, achieving the highest accuracy, precision, recall, and F1 score. This is likely due to its deep architecture and residual connections, which help in learning complex features and achieving robust predictions.
-- **EfficientNetB0**, despite its computational efficiency, struggled with this task, achieving the lowest performance across all metrics. This could be due to insufficient epochs for full convergence or the model's inherent bias towards lightweight computations at the expense of fine-grained accuracy.
+- **EfficientNetB0**, despite its computational efficiency, struggled with this task, achieving the lowest performance across all metrics. This could be due to insufficient epochs for full convergence or the model's inherent bias towards lightweight computations at the expense of fine-grained accuracy. Also, the reason for poor performance might be the fact that we had to turn off the weights of the model for training. We couldn't solve errors that were occuring when weights were turned on.
 - **MobileNetV2** performed moderately well, with metrics indicating a balance between computational efficiency and predictive performance. It is a good choice for scenarios requiring real-time inference on resource-constrained devices.
 
 ### Conclusion
