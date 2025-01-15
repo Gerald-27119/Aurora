@@ -22,19 +22,15 @@ class CalculateMetrics:
         with open(classes_path, "r") as f:
             self.class_names = json.load(f)
 
-        self.model = self.load_model()  # Wczytaj model przy inicjalizacji
+        self.model = self.load_model()
 
     def load_model(self):
-        """
-        Własna funkcja wczytania modelu MobileNetV2.
-        """
         num_classes = len(self.class_names)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        # Inicjalizacja modelu MobileNetV2 z pretrenowanymi wagami
         model = models.mobilenet_v2(weights=models.MobileNet_V2_Weights.IMAGENET1K_V1)
 
-        # Dostosowanie ostatniej warstwy klasyfikatora do liczby klas
+        # Dostosowanie ostatniej warstwy klasyfikatora do liczby klas z dataseta
         num_features = model.classifier[1].in_features
         model.classifier[1] = nn.Linear(num_features, num_classes)
 
@@ -48,9 +44,6 @@ class CalculateMetrics:
         return model
 
     def preprocess_image(self, img_path):
-        """
-        Wstępne przetwarzanie obrazu przed podaniem go do modelu.
-        """
         transform = transforms.Compose([
             transforms.Resize((224, 224)),
             transforms.ToTensor(),
@@ -62,9 +55,6 @@ class CalculateMetrics:
         return img_tensor
 
     def predict_image(self, img_path):
-        """
-        Wykonuje predykcję na pojedynczym obrazie.
-        """
         device = next(self.model.parameters()).device
         img_tensor = self.preprocess_image(img_path).to(device)
 
@@ -98,7 +88,6 @@ class CalculateMetrics:
                 true_labels.append(class_name)
                 predicted_labels.append(prediction["result"])
 
-        # Oblicz metryki
         self.calculate_and_save_metrics(true_labels, predicted_labels)
 
     def calculate_and_save_metrics(self, true_labels, predicted_labels):
@@ -110,7 +99,6 @@ class CalculateMetrics:
         recall = recall_score(true_labels, predicted_labels, average='weighted')
         f1 = f1_score(true_labels, predicted_labels, average='weighted')
 
-        # Zapisz metryki do pliku
         with open(self.output_file, 'w') as f:
             f.write(f"Accuracy: {accuracy:.4f}\n")
             f.write(f"Precision: {precision:.4f}\n")
@@ -119,8 +107,6 @@ class CalculateMetrics:
 
         print("Evaluation complete. Results saved to", self.output_file)
 
-
-# Przykład użycia
 if __name__ == "__main__":
     test_images_path = "../datasets/car_data/test"
     training_dir = "../datasets/car_data/train"

@@ -12,14 +12,12 @@ def get_class_names():
 
 
 def load_model(num_classes, model_path=None, device='cuda' if torch.cuda.is_available() else 'cpu'):
-    # Initialize the model without pretrained weights
     base_model = models.efficientnet_b0(weights=None)
     base_model.classifier = nn.Sequential(
         nn.Dropout(0.3),
         nn.Linear(base_model.classifier[1].in_features, num_classes)
     )
 
-    # Load custom weights if provided
     if model_path and os.path.exists(model_path):
         base_model.load_state_dict(torch.load(model_path, map_location=device))
 
@@ -29,10 +27,11 @@ def load_model(num_classes, model_path=None, device='cuda' if torch.cuda.is_avai
 
 
 def preprocess_image(img_path):
+    # Zmiana rozmiaru zdjęć oraz dostosowanie ich do formatu pytorcha
     transform = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])  # ImageNet mean and std
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ])
     image = Image.open(img_path).convert("RGB")
     img_tensor = transform(image)
@@ -47,10 +46,11 @@ def predict_car_model(img_path):
     model = load_model(num_classes=len(class_names), device=device)
     img_tensor = preprocess_image(img_path).to(device)
 
+    # Wyłączenie gradientów do predykcji
     with torch.no_grad():
-        predictions = model(img_tensor)  # Logits
-        probabilities = F.softmax(predictions, dim=1)  # Convert logits to probabilities
-        confidence, predicted_idx = torch.max(probabilities, 1)  # Confidence and class index
+        predictions = model(img_tensor)
+        probabilities = F.softmax(predictions, dim=1)
+        confidence, predicted_idx = torch.max(probabilities, 1)
         predicted_class = class_names[predicted_idx.item()]
         confidence_percentage = confidence.item() * 100
 

@@ -5,10 +5,9 @@ from torchvision import models, transforms
 from PIL import Image
 import torch.nn.functional as F
 
-# Ścieżki do modelu i pliku klas
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, "car_classifier.pth")
-CLASSES_PATH = os.path.join(BASE_DIR, "classes.json")  # Upewnij się, że ścieżka jest poprawna
+CLASSES_PATH = os.path.join(BASE_DIR, "classes.json")
 
 # Ładowanie klas z pliku JSON
 if not os.path.exists(CLASSES_PATH):
@@ -29,7 +28,7 @@ def load_model():
     model.eval()
     return model
 
-# Definicja transformacji
+# Zmiana rozmiaru zdjęć oraz dostosowanie ich do formatu pytorcha
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
@@ -39,17 +38,26 @@ transform = transforms.Compose([
 
 def predict_image(image_path, model):
     device = next(model.parameters()).device
+
     try:
         img = Image.open(image_path).convert("RGB")
     except Exception as e:
         raise ValueError(f"Nie można otworzyć obrazu: {e}")
 
-    img_tensor = transform(img).unsqueeze(0).to(device)  # Dodanie wymiaru batch
+    # Przekształcenie obrazu za pomocą zdefiniowanej transformacji i dodanie wymiaru batcha
+    img_tensor = transform(img).unsqueeze(0).to(device)
+
+    # Wyłączenie obliczenia gradientów, aby zaoszczędzić pamięć i przyspieszyć obliczenia
     with torch.no_grad():
         outputs = model(img_tensor)
+
         probabilities = F.softmax(outputs, dim=1)
+
         confidence, predicted_idx = torch.max(probabilities, 1)
+
         predicted_class = CLASS_NAMES[predicted_idx.item()]
+
         confidence_percentage = confidence.item() * 100
 
     return {"result": predicted_class, "confidence": f"{confidence_percentage:.2f}%"}
+

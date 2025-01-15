@@ -13,11 +13,11 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 DATA_DIR = "../datasets/car_data/train"
+# zbiór testowy 4 pojazdów
 # DATA_DIR = "../datasets/car_data/small_train"
 MODEL_PATH = "./car_classifier.pth"
-CLASSES_PATH = "./classes.json"  # Ścieżka do zapisu klas
+CLASSES_PATH = "./classes.json"
 
-# Definicje funkcji treningu i walidacji pozostają bez zmian
 def train_model(train_loader, model, criterion, optimizer, device, epochs=20):
     logger.info("Starting training...")
     model.train()
@@ -80,18 +80,16 @@ def validate_model(val_loader, model, criterion, device):
 if __name__ == "__main__":
     logger.info("Script started.")
 
-    # Set device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info(f"Using device: {device}")
 
-    # Define transformations
+    # Zmiana rozmiaru zdjęć oraz dostosowanie ich do formatu pytorcha
     transform = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
 
-    # Load the dataset
     logger.info("Loading dataset...")
     dataset = datasets.ImageFolder(root=DATA_DIR, transform=transform)
     logger.info(f"Dataset loaded with {len(dataset)} images.")
@@ -102,10 +100,8 @@ if __name__ == "__main__":
         json.dump(dataset.classes, f)
     logger.info(f"Lista klas zapisana do {CLASSES_PATH}")
 
-    # Number of classes
     num_classes = len(dataset.classes)
 
-    # Split into training and validation sets
     train_size = int(0.8 * len(dataset))
     val_size = len(dataset) - train_size
     train_dataset, val_dataset = torch.utils.data.random_split(
@@ -115,22 +111,18 @@ if __name__ == "__main__":
     logger.info(f"Training set size: {len(train_dataset)}")
     logger.info(f"Validation set size: {len(val_dataset)}")
 
-    # Load datasets into DataLoaders
     train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, num_workers=4, pin_memory=True)
     val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False, num_workers=4, pin_memory=True)
 
-    # Load pre-trained ResNet50 model
     logger.info("Loading model...")
     model = models.resnet50(weights=ResNet50_Weights.IMAGENET1K_V1)
-    model.fc = nn.Linear(model.fc.in_features, num_classes)  # Multi-class output
+    model.fc = nn.Linear(model.fc.in_features, num_classes)
     model.to(device)
     logger.info("Model loaded successfully.")
 
-    # Define loss function and optimizer
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-    # Trening i walidacja
     train_model(train_loader, model, criterion, optimizer, device, epochs=30)
     validate_model(val_loader, model, criterion, device)
 

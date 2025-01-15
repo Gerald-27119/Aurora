@@ -5,10 +5,9 @@ from torchvision import models, transforms
 from PIL import Image
 import torch.nn.functional as F
 
-# Ścieżki do modelu i pliku klas
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "car_classifier_mobilenetv2.pth")  # Upewnij się, że nazwa pliku jest poprawna
-CLASSES_PATH = os.path.join(BASE_DIR, "classes.json")  # Upewnij się, że ścieżka jest poprawna
+MODEL_PATH = os.path.join(BASE_DIR, "car_classifier_mobilenetv2.pth")
+CLASSES_PATH = os.path.join(BASE_DIR, "classes.json")
 
 # Ładowanie klas z pliku JSON
 if not os.path.exists(CLASSES_PATH):
@@ -18,16 +17,9 @@ with open(CLASSES_PATH, "r") as f:
     CLASS_NAMES = json.load(f)
 
 def load_model():
-    """
-    Ładuje wytrenowany model MobileNetV2.
-
-    Returns:
-        model (torch.nn.Module): Załadowany model MobileNetV2.
-    """
     num_classes = len(CLASS_NAMES)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # Inicjalizacja modelu MobileNetV2 z pretrenowanymi wagami
     model = models.mobilenet_v2(weights=models.MobileNet_V2_Weights.IMAGENET1K_V1)
 
     # Dostosowanie ostatniej warstwy klasyfikatora do liczby klas
@@ -37,13 +29,11 @@ def load_model():
     if not os.path.exists(MODEL_PATH):
         raise FileNotFoundError(f"Plik modelu {MODEL_PATH} nie został znaleziony.")
 
-    # Ładowanie wag modelu
     model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
     model.to(device)
     model.eval()
     return model
 
-# Definicja transformacji
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
@@ -52,23 +42,13 @@ transform = transforms.Compose([
 ])
 
 def predict_image(image_path, model):
-    """
-    Wykonuje predykcje na podanym obrazie za pomocą modelu MobileNetV2.
-
-    Args:
-        image_path (str): Ścieżka do obrazu.
-        model (torch.nn.Module): Załadowany model MobileNetV2.
-
-    Returns:
-        dict: Predykcja zawierająca wynik i poziom pewności.
-    """
     device = next(model.parameters()).device
     try:
         img = Image.open(image_path).convert("RGB")
     except Exception as e:
         raise ValueError(f"Nie można otworzyć obrazu: {e}")
 
-    img_tensor = transform(img).unsqueeze(0).to(device)  # Dodanie wymiaru batch
+    img_tensor = transform(img).unsqueeze(0).to(device)
     with torch.no_grad():
         outputs = model(img_tensor)
         probabilities = F.softmax(outputs, dim=1)

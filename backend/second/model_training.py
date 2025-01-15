@@ -6,9 +6,6 @@ from torchvision import models, transforms
 from PIL import Image
 import os
 
-from torchvision.models import EfficientNet_B0_Weights
-
-
 class CarDataset(Dataset):
     def __init__(self, directory, transform=None):
         self.directory = directory
@@ -35,11 +32,11 @@ class CarDataset(Dataset):
             image = self.transform(image)
         return image, label
 
-
+# Zmiana rozmiaru zdjęć oraz dostosowanie ich do formatu pytorcha
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
-    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])  # ImageNet mean and std
+    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]) #mean - średnia, std - odchylenie standardowe
 ])
 
 def create_dataloader(directory, batch_size=32):
@@ -59,7 +56,7 @@ def train_model():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
-
+    # Na maszynie Adama model z wagami nie działał
     # base_model = models.efficientnet_b0(weights=EfficientNet_B0_Weights.IMAGENET1K_V1)
     base_model = models.efficientnet_b0(weights=None)
 

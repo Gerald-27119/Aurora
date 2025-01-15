@@ -4,7 +4,7 @@ import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
 from torchvision import datasets, models, transforms
-from torchvision.models import MobileNet_V2_Weights  # Zmiana importu
+from torchvision.models import MobileNet_V2_Weights
 
 logging.basicConfig(
     level=logging.INFO,
@@ -17,7 +17,6 @@ DATA_DIR = "../datasets/car_data/train"
 MODEL_PATH = "./car_classifier_mobilenetv2.pth"
 CLASSES_PATH = "./classes.json"
 
-# Definicje funkcji treningu i walidacji pozostają bez zmian
 def train_model(train_loader, model, criterion, optimizer, device, epochs=20):
     logger.info("Starting training...")
     model.train()
@@ -80,18 +79,15 @@ def validate_model(val_loader, model, criterion, device):
 if __name__ == "__main__":
     logger.info("Script started.")
 
-    # Ustawienie urządzenia
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info(f"Using device: {device}")
 
-    # Definicje transformacji
     transform = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
 
-    # Ładowanie zbioru danych
     logger.info("Loading dataset...")
     dataset = datasets.ImageFolder(root=DATA_DIR, transform=transform)
     logger.info(f"Dataset loaded with {len(dataset)} images.")
@@ -102,10 +98,8 @@ if __name__ == "__main__":
         json.dump(dataset.classes, f)
     logger.info(f"Lista klas zapisana do {CLASSES_PATH}")
 
-    # Liczba klas
     num_classes = len(dataset.classes)
 
-    # Podział na zbiór treningowy i walidacyjny
     train_size = int(0.8 * len(dataset))
     val_size = len(dataset) - train_size
     train_dataset, val_dataset = torch.utils.data.random_split(
@@ -115,11 +109,9 @@ if __name__ == "__main__":
     logger.info(f"Training set size: {len(train_dataset)}")
     logger.info(f"Validation set size: {len(val_dataset)}")
 
-    # Ładowanie danych do DataLoaderów
     train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, num_workers=4, pin_memory=True)
     val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False, num_workers=4, pin_memory=True)
 
-    # Ładowanie pretrenowanego modelu MobileNetV2
     logger.info("Loading MobileNetV2 model...")
     model = models.mobilenet_v2(weights=MobileNet_V2_Weights.IMAGENET1K_V1)
 
@@ -130,11 +122,9 @@ if __name__ == "__main__":
     model.to(device)
     logger.info("MobileNetV2 model loaded and modified successfully.")
 
-    # Definicja funkcji straty i optymalizatora
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-    # Trening i walidacja
     train_model(train_loader, model, criterion, optimizer, device, epochs=30)
     validate_model(val_loader, model, criterion, device)
 
